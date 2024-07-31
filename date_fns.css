@@ -1,0 +1,29 @@
+/*  ---   https://date-fns.org/
+xem tarng SalesChart.jsx
+1. eachDayOfInterval: tạo 1 mảng gồm ngày bắt đầu và ngày kết thúc
+2. subDays: trừ ngày đc chọn cho số ngày mình muốn : ex: today(July 30) - 7 =  July 24
+                đổi sang đang ISOString() === subDays(new Date(), numDays).toISOString();
+3. isSameDay(date, new Date(booking.created_at)) :  so sánh 2 ngày giống nhau ? trả về 1 Object 
+4. format(date, "MMM dd"), ==>  trả về dạng Sep 16
+
+xem BookingDataBox
+5. isToday(new Date(startDate)) : check ngày lựa chọn có phải hôm nay hay ko ?
+6. {format(new Date(endDate), "EEE, MMM dd yyyy")} ==> trả về dạng  Mon, Sep 16 2024
+
+xem helpers.js
+7. parseISO: Convert string '2014-02-11T11:30:30' to date:
+ex: parseISO('2014-02-11T11:30:30') => Tue Feb 11 2014 11:30:30
+
+8. formatDistance: chuyển từ khoảng cách của các ngày thành chữ 
+    ex: sau khi trừ 2 ngày ta có khóang cách là ( 1 yr -> 1 yr 3 months) thì hiển thị trển UI là: "about 1 year"
+
+9. differenceInDays: trừ 2 ngày == > trả về con số ( 3,6,7 ngày...)   
+        ex: (July 30 - July 24 = 7) ( xem sự khac nhau giữa subDays và differenceInDays)
+
+
+
+
+
+
+
+*/

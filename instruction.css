@@ -1,0 +1,203 @@
+/* cài đặt Vite
+    npm create vite@4
+...đặt tên project
+.. React
+...Javascript
+
+-  2. dán folder vào Vscode tạo package
+npm i
+npm i eslint vite-plugin-eslint eslint-config-react-app --save-dev
+5. tạo 1 file mới trong src đặt tên: .eslintrc.json : viết code để config eslint
+6. tại file vite.config.js sửa: 
+	import eslint from "vite-plugin-eslint";
+ 	export default defineConfig({
+  		plugins: [react(), eslint()],
+	});
+*/
+
+/* --------- styled components:  npm i styled-components
+ phai install thêm add-on: vscode-styled-components
+
+ // stored kết quả trả về trong React COmponennt nên phải viết hoa chữ đầu
+// styled component nghĩa là vừa tạo component vừa tạo style trong cùng 1 chỗ
+// ==> có thể gọi component nhiều nơi
+
+ ------ tạo local Styled Components gọi tại những page cần nó
+ import styled from "styled-components"; 
+ bay giờ mỗi class name là 1 React component nên phải viết hoa chữ đầu
+ex: const H1 = styled.h1`
+  font-size: 30px;
+  font-weight: 600;
+`;
+
+ex2: const FilterButton = styled.button`
+  background-color: var(--color-grey-0);
+  border: none;    
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  font-size: 1.4rem;
+        // nếu button nhận đc props === active thi css thêm phần dưới KO có props thì chỉ phần trên
+  ${(props) =>
+    props.active &&
+    css`
+      background-color: var(--color-brand-600);
+      color: var(--color-brand-50);
+    `}
+
+        // nếu truyền vào props như đang này thì BẮT BUỘC phải khai báo thêm props là columns={...} khi dùng Component này
+  grid-template-columns: ${(props) => props.columns};
+
+========= cách truyền và gọi props 
+function Backdrop({ opacity, color, children }) {
+  return (
+    <Wrapper opacity={opacity} color={color}>
+      {children}
+    </Wrapper>
+  )
+}
+const Wrapper = styled.div`
+  opacity: ${p => p.opacity};
+  background-color: ${p => p.color};
+
+  ===== XEM BUTTON.jsx để xem cách truyền và gọi khi PROPS LÀ 1 MẢNG
+
+
+------------- createGlobalStyle cho toàn App
+xem GlobalStyles.js
+import { createGlobalStyle } from "styled-components";
+const GlobalStyles = createGlobalStyle`
+  viết css tại đây
+`
+*/
+
+/* vì tyled-component là 1 React Component nên có thể nhận prop và xử lý bằng js trong đây
+tại Heading.jsx
+const Heading = styled.h1`
+  ${(props) =>
+    props.as === "h1" &&
+    css`
+      font-size: 3rem;
+      font-weight: 600;
+    `}
+
+  ${(props) =>
+    props.as === "h2" &&
+    css`
+      font-size: 2rem;
+      font-weight: 600;
+    `}
+`
+khi truyền as prop tại App.js thì nó sẽ tạo html đúng như tên đặt 
+        ex: as="h3" ==> <h3>Form</h3> 
+
+========= khi gặp Warning : Warning: Received `false` for a non-boolean attribute 
+                          styled-components: it looks like an unknown prop "variation" is being sent through to the DOM
+
+            thì THÊM $ trước tên props khi khai báo : ex: sửa unknown prop "variation" : $variation 
+
+*/
+
+/* cách dùng styled cho 1 component bên trong another component
+ex: muốn styled component NavLink 
+    1. const StyledNavLink = styled(NavLink)`` : truyền NavLink vào styled như argument
+    2. return <StyledNavLink to="/dashboard">Home </StyledNavLink>
+*/
+
+/* install npm react router 
+npm i react-router-dom@6
+
+*/
+
+/*
+  khi login form thành công tại LoginForm.jsx page chuyển đến DashBoard và trả về isAuthenticated === true 
+  nhưng bây giờ nếu vào trực tiếp http://localhost:5173/dashboard vẫn ĐƯỢC 
+          ==> cần tạo ProtectedRoute.jsx bao bọc bên ngoài toàn AppLayout để check user Authenticated trước
+                            nếu có isAuthenticated === true thì vào http://localhost:5173/dashboard bình thường 
+                            nêu vào trực tiếp http://localhost:5173/dashboard ==> ko qua LoginForm.jsx ==> isAuthenticated === false ==> tự động quay về trang LoginForm.jsx
+
+*/
+
+/* sơ đồ data flow
+                                          -> Header -> UserAvatar
+                                                    -> HeaderMenu -> Logout
+                                                                  -> Account -> UpdateUserDataForm -> apiAuth -> useUpdateUser
+                                                                  -> DarkModeToggle -> DarkModeContext (chèn DarkModeProvider ngoài cùng, state isDarkMode sẽ có tác dụng cho toàn App)
+                                          -> Sidebar
+   (viết check authenticated user tại ProtectedRoute -> apiAuth -> userUser => nó sẽ check cho toàn bộ app)                   
+App -> DarkModeProvider -> ProtectedRoute -> AppLayout  -> DashBoard -> DashboardLayout -> Stats -> Stat
+                                                                                        -> SalesChart
+                                                                                        -> DurationChart
+                                                                                        -> TodayActivity -> useTodayactivity -> TodayItem -> CheckoutButton
+                                                                     -> DashboardFilter
+                                                        -> Bookings  -> Heading
+                                                                      -> BookingTableOperations -> TableOpeartions -> Filter <==>  CabinTable nhận data từ url để Filter rồi hiển thị ra UI
+                                                                                                                  -> SortBy -> Select <==> CabinTable nhận data từ url để Sort rồi hiển thị ra UI
+                                                                      -> BookingTable -> Menus -> Table -> BookingRow -> Table.Row
+                                                                                                                      -> Tag
+                                                                                                                      -> Menus.Button  -> Booking -> BookingDetail -> apiBooking -> useBooking -> BookingDataBox 
+                                                                                                                      -> Checkin -> CheckinBooking -> useCheckin.js)
+                                                                                                                      -> useCheckout.js    
+                                                                                                                      -> useDeleteBooking.js
+                                                        ( -> Booking -> BookingDetail -> BookingDataBox )
+                                                        ( -> Checkin -> CheckinBooking -> useChecking.js )
+
+                                                        -> Account
+                                                        -> Cabins -> Heading
+                                                                  -> CabinTableOperations -> TableOpeartions -> Filter <==>  CabinTable nhận data từ url để Filter rồi hiển thị ra UI
+                                                                                                            -> SortBy -> Select <==> CabinTable nhận data từ url để Sort rồi hiển thị ra UI
+                                                                  -> CabinTable  -> Menus -> Table -> CabinRow  -> Menus.Menu ...
+                                                                                                                -> Table.Row
+                                                                                                                -> ConfirmDelete
+                                                                                                                -> AddCabin -> Modal -> CreateCabinForm
+                                                                  -> AddCabin -> Modal -> CreateCabinForm
+
+                                                        -> Settings -> useSetting -> useUpdateSetting -> UpdateSettingsForm
+                                                        -> Users -> (apiAuth -> useSignup) -> SignupForm  
+
+                                          -> Login -> LoginForm -> apiAuth -> useLogin -> DashBoard
+                                          -> * === PageNotFound               
+
+    ===== Pagination flow
+    apiBooking -> useBookings -> BookingTable -> Pagnination
+*/
+
+/*  ============ Authentication ( https://temp-mail.org/en/ : tạo temp email for testing
+ ============  I . tạo new user - signup
+  1. Users -> 
+  2. apiAuth (viết hàm signup()) 
+  3. useSignup (dùng react query gọi signup() trả về data khi onSuccess() 
+  4. vào SignupForm gọi useSignup add data nhập từ input rồi create và add vào database 
+
+  ===========  II. check Authenticated của USer khi login
+  1. Login -> 
+  2. apiAuth (viết hàm login()
+  3. useLogin (dùng react query gọi login() trả về data khi onSuccess() 
+  4. vào LoginForm gọi useLogin add data nhập từ input, khi login onSuccess() trả về isAuthenticated === true 
+  5. ProtectedRoute.jsx bao bọc bên ngoài toàn AppLayout để check user Authenticated trước
+                            nếu có isAuthenticated === true thì vào http://localhost:5173/dashboard bình thường 
+                            nêu vào trực tiếp http://localhost:5173/dashboard ==> ko qua LoginForm.jsx ==> isAuthenticated === false ==> tự động quay về trang LoginForm.jsx
+  6. apiAuth -> userUser (trả về  isAuthenticated === true khi onSuccess()
+  7. ProtectedRoute.jsx kiem tra isAuthenticated === true nhận đc từ userUser và return children là toàn bộ các page/component con của Protected có thể RENDER
+
+*/
+
+/* ======== dùng React Error Boundaries để bắt ac1c lỗi có thể thể xảy ra khi Reander
+1. npm i react-error-boundary
+2 . wrap bên ngoài App tại trang main.js để tác dụng lên tao2n bộ App
+
+*/
+
+/* gom toàn bộ file trong App lại thành 1 bundle để upload lên server / netlify...
+1. npm run build ==> tạo 1 folder dist ( nếu còn báo lỗi hoặc warning thi fix lổi trước)
+
+2. tại dist -> tạo 1 file netlify.toml
+      -> viết [[redirects]]
+              from = "/*"
+              to = "/index.html"
+              status = 200
+
+3. copy file netlify ra ngoài folder chính   
+            
+4. upload folder : dist to Netlify 
+
+*/

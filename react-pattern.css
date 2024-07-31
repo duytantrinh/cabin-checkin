@@ -1,0 +1,36 @@
+/* ============= Compound Component React Patterns make component more resuable and flexible
+    4 bước ( ví dụ là Modal.jsx)
+1. tạo Context APi
+const ModalContext = createContext();
+
+2. tạo parent component - {children} : là Window and Open
+
+  return (
+    <ModalContext.Provider value={{ tất cả các value muốn truyền đến child component }}>
+      {children}
+    </ModalContext.Provider>
+  );
+
+3. tạo children  component để thực hiện task
+
+4. add child component as a properties to parent component
+Modal.OpenButton = OpenButton;
+Modal.Window = Window;
+
+
+
+*********  cách render child component bên trong Compound Component Pattern
+<Table.Body
+    data={cabins}
+    render={(cabin) => <CabinRow cabin={cabin} key={cabin.id} />}
+/>
+
+tại Table.jsx: 
+function Body({ render, data }) {
+    if (!data.length) return <Empty>No data at the moment</Empty>;
+
+    return <StyledBody>{data.map(render)}</StyledBody>;
+}
+
+
+*/

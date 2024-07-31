@@ -1,0 +1,149 @@
+/* ------------ Supabase.com -- connect login with github
+name: the-wild-oasis
+pass-project-the-wild-oasis: rU5LDO6OB9gY8QBP
+
+ *** connect Supabase data with Our React Project - đọc API Docs 
+1. npm install --save @supabase/supabase-js
+2. Authentication -> Policies -> click vào từng table tạo Policy để protect table
+      depends on user : có thể chỉ read, có thể đc update
+3. tại supabase.com :  Storage -> New bucket (tạo các bucket để chứa images...) 
+      4. tạo file services/supabase.js để dán code để connect supabase, API key cho toàn App
+5. tạo api cho từng page ex: apiCabins.js, apiGuest.js....
+6. dung React Query để làm việc với data (get,delete,update...)
+
+*/
+
+/* ------- uPLOAD FILE/IMAGE TOM SUPABASE
+
+*/
+
+/* ----------------------   React Query 
+--  làm viêc với remote (server) state : state đc store trên sevrer , we need to load and work at UI
+
+***** installation 
+1. npm i @tanstack/react-query@4
+2. npm i @tanstack/react-query-devtools@4
+
+
+-- tại App.jsx 
+    1. import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+       import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+    2. <QueryClientProvider client={queryClient}> 
+            <ReactQueryDevtools initialIsOpen={false} />
+            App 
+        </QueryClientProvider> 
+         chèn bên ngoài cùng của tree data ==> provide QueryClient và ReactQueryDevtools cho toàn App
+
+--- tại các child component (ex: CabinTable.jsx)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*********************************** GET DATA các bước thực hiện
+      ***************** fetch data và lưu vào cache dùng useQuery()
+3. const { isFetching, data: cabins } = useQuery({
+            // unique : phải là dạng array  ==> query  ["cabin"] đã đc lưu tại cache
+            // tại các component khác nếu muốn dùng query này thì chỉ cần gọi ["cabins"]
+      queryKey: ["cabins"],
+            // function để fetching API , cần truyền vào 1 promise
+      queryFn: getCabins, // nếu KHÔNG có parameter chỉ gọi tên hàm getCabins, KHƠNG dc gọi thực thi getCabins()
+});
+
+ tại CabinRow.jsx -- nơi chứa button delete
+      ***************** delete/insert/update data dùng useMutation() 
+ 
+  4. const queryClient = useQueryClient(); //useQueryClient() gọi sử dụng QueryClient đc truyền tại App
+
+  
+ 5.  const { isFetching: isDeleting, mutate } = useMutation({
+    mutationFn: (id) => deleteCabin(id), // truyền currentId vào hàm deleteCabin(id)
+
+        // gọi hàm onSuccess đề tự động refresh trang khi delete cabin thành công
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["cabins"], // phải gọi dúng tên queryKey đã đc khởi tạo tại useQuery()
+      });
+    },
+  });
+
+  chỗ nào muốn handle Xử lý data để show ra UI thì gọi mutate() 
+  (ex: tại CabinRow muốn delete ==> mutate(id) . Tại CrateCabinForm muốn tạo cabin mới ===> 6. mutate(newCabin)
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      -------------------------- React Hook Form : useForm();
+            ta ko cần tạo state cho các input, button nữa
+.... npm i react-hook-form@7
+            -- bên ngoải UI
+1. bắt buộc phải destructure tên là register, handleSubmit,reset
+  const { register, handleSubmit, reset,, getValues, formState } = useForm();
+         register: đăng ký các input với useForm
+     handleSubmit: xử lý hàm submit
+     reset: reset lại các input sau khi submit
+     getValues: get all giá trị trong toàn bộ Form khi submit 
+    formState: get all state của Form
+
+2. useQueryClient() gọi sử dụng QueryClient đc truyền tại App
+  const queryClient = useQueryClient();
+
+3. dùng hook useMutation để xử lý kết quả trả về success or error
+  const { mutate, isFetching: isCreating } = useMutation({ })
+
+4. handleSubmit() là React Query function nếu submit data đ1ung thực thi hàm OnSubmitted
+                                              submit data lỗi thực thi hàm thứ 2 onError
+    <Form onSubmit={handleSubmit(onSubmitted, onError)}>
+
+5.  ...register("name")} truyền hook useForm() vào cho input, phải gọi đúng tên của id của input,
+                         có thể truyền thêm nhiều diêu kien trong register 
+       tên id của input phải trùng tên với tên cột tương ứng trong table (xem UpdateSettingsForm.jsx)
+
+        {errors?.name?.message && <Error>{errors.name.message}</Error>}  :   băt lỗi input từ hàm register 
+
+6.  mutate là hàm xử lý cuối cùng cho event handler: mutate(data) === handleInsert(data)
+       
+            --- hàm select, insert,update sẽ đc viết tại apiCabins.jsx
+*/
+
+/* tạo toast notification
+ npm i react-hot-toast
+ 
+ 1. chèn  <Toaster /> tại App và configuration cho nó
+ 2. gọi tại các child component (ex: CabinRow.jsx : toast.success("Cabin successfully deleted");
+*/
+
+/* /////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+                   REACT QUERY cho SETTING
+/* ================= Load data
+1. viết getSettings() tại apiSettings
+2. tạo hook : useSettings.js
+3. tại UpdateSettingsForm: gọi hook useSettings và destructuring các biến ra
+4. dàn các biến vào các input tương ứng với defaultValue
+
+=============== update bằng useForm
+1. tại apiSetting : viết hàm updateSetting(newSetting) ==> truyền vào newSetting
+2. tạo hook useUpdateSetting 
+3. tại UpdateSettingsForm: gọi hook useForm để kết nối với các input
+                           gọi hook useUpdateSetting dể sử dụng sql
+                          dùng {handleSubmit(onSubmmitted)} để update data
+*/
+
+/* cong dụng của QueryClient
+
+      1. set data user vào react query cache thông qua queryKey ['user']
+ queryClient.setQueryData(["user"], user.user);
+
+     2.  remove tất cả các query đang được lưu tại cache
+queryClient.removeQueries();
+
+      3. useMutation() ko tự động refetch , phải gọi  .invalidateQueries để refetch 
+      khi đã query onSuccess, làm bookings queries to get invalidated để tiếp tục refetched to show the new bookings item
+queryClient.invalidateQueries({
+      queryKey: ["bookings"],
+});
+
+*/
+
+/* isLoading === isPending
+
+       The cacheTime === gcTime */
