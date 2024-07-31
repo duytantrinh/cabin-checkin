@@ -4,4 +4,6 @@
 3. git add -A : chuyền tất cả các file sang A (ADDED) -- PHẢI CHUYỂN TẤT CẢ FILE SANG A TRU7O781C KHI COMMIT
 4. git commit -m 'Initial commit' : clear A vì nó đã đc commit vào git tree 
 
+5. git remote add origin https://github.com/duytantrinh/cabin-checkin.git : kết nối vối git
+6. git push -u origin master : upload local file (this app) lên github
 */
