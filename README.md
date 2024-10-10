@@ -1,5 +1,6 @@
-# React + Vite
+# React + styled component + React Query + React Hook Form + React Router Dom  + Recharts.js 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-The wild Oasis
+website: https://cabin-checkin.vercel.app/login
+User and Password for login
+user:  tan123@gmail.com
+pass: tan123
