@@ -29,6 +29,8 @@ function LoginForm() {
   }
 
   return (
+    <>
+    
       (testing email: tan123@gmail.com / pass: tan123)
     <Form onSubmit={handleSubmit}>
       <FormRowVertical label="Email address">
@@ -58,6 +60,7 @@ function LoginForm() {
         </Button>
       </FormRowVertical>
     </Form>
+      </>
   );
 }
 
